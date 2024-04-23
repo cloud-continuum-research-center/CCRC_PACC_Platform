@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+  external_labels:
+    DataCenter: <data_center_name>
+
+# 포트번호는 20000 (metric-server)
+
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "clusterX"
+    metrics_path: /actuator/prometheus 
+    static_configs:
+      - targets: [":20000"]
+
+#  사이드카 테스트용
+#  sidecar_ip:9092/metrics로 접속해서 확인하는 것도 가능
+#  - job_name: "sidecar"
+#    static_configs:
+#    - targets: [cluster_ip:9092] # sidecar의 http-address를 입력 (default port : 9092)

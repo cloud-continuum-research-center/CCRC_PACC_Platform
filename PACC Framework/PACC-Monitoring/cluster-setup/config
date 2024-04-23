@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 5s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 5s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+  external_labels:
+    Cluster: clusterX
+
+# 포트번호는 9100 (Node Exporter), 9400 (DCGM Exporter)
+
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "job_name"
+    static_configs:
+      - targets: [":9100", ":9400"]
