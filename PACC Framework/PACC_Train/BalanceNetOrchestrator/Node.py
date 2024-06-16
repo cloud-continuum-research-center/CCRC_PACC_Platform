@@ -2,6 +2,7 @@ from RUDP import RUDP
 import torch
 import threading
 import io
+import time
 
 def parse_address(address):
     if ':' in address:
@@ -40,13 +41,25 @@ class Node:
         self.is_Done = False
         self.testcount = 0
         self.current_state = 0
+        self.current_epoch = 0
         self.reset_state_function = reset_state_function
         self.metrics = []  # 에포크별 성능 메트릭스를 저장할 리스트
+
+        self.communication_times = []  # 메시지 송수신 시간 기록용
+        self.epoch_times = []  # 에포크 처리 시간 기록용
+        self.sync_times = []  # 동기화 시간 기록용
+        
         self.retain_graph = retain_graph
 
     def start(self):
         if not self.children_addresses:
             self.send_ready_to_parent()
+
+    def get_current_state(self):
+        return self.current_state
+    
+    def get_current_epoch(self):
+        return self.current_epoch
 
     def get_metrics(self):
         organized_metrics = {}
@@ -116,11 +129,11 @@ class Node:
 
     def train(self):
         
-        
+        self.current_state = 1
         print("Training started.")
         print("epochs Count  :" , self.epochs)
         for epoch in range(self.epochs):
-            
+            self.current_epoch +=1
             self.metrics.append(self.train_func(self))
             
             print("current  : ", epoch," / ", int(self.epochs))
@@ -157,7 +170,7 @@ class Node:
                 weights = self.model.state_dict()
                 self.send_weight_to_parent(weights)
 
-            print("current ", self.update_weights_count," / ", int(self.epochs))
+            #print("current ", self.update_weights_count," / ", int(self.epochs))
 
             if self.parent_address:
                 self.wait_for_update.wait()
